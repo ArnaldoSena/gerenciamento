@@ -24,8 +24,8 @@ public class PessoaMapper {
 	public static PessoaResponse mapper(Pessoa pessoa) {
 		return	PessoaResponse.builder()
 				.nome(pessoa.getNome())
-				.identificador(pessoa.getNome())
-				.tipoIdentificador(pessoa.getIdentificador())
+				.identificador(pessoa.getIdentificador())
+				.tipoIdentificador(pessoa.getTipoIdentificador())
 				.build();
 	}
 	/**

@@ -1,8 +1,12 @@
 package com.teste.gerenciamento.usercase.exception;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
 import lombok.Builder;
 
-public class PessoaNotFound extends Exception{
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public class PessoaNotFound extends RuntimeException{
 	
 	private static final long serialVersionUID = 1L;
 
@@ -10,4 +14,5 @@ public class PessoaNotFound extends Exception{
 	public PessoaNotFound(String message) {
 		super(message);
 	}
+
 }

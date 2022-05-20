@@ -23,7 +23,7 @@ public class CreatePessoaService {
 		var newPessoa = Pessoa.builder()
 				.nome(pessoa.getNome())
 				.identificador(pessoa.getIdentificador())
-				.tipoIdentificador(pessoa.getIdentificador())
+				.tipoIdentificador(pessoa.getTipoIdentificador())
 				.build();
 		return repository.create(newPessoa);
 	}

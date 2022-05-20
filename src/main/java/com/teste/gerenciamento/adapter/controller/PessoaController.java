@@ -2,6 +2,8 @@ package com.teste.gerenciamento.adapter.controller;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.teste.gerenciamento.entity.Pessoa;
 import com.teste.gerenciamento.erro.Erro;
+import com.teste.gerenciamento.usercase.exception.PessoaNotFound;
 import com.teste.gerenciamento.usercase.mapper.PessoaMapper;
 import com.teste.gerenciamento.usercase.service.CreatePessoaService;
 import com.teste.gerenciamento.usercase.service.DeletePessoaService;
@@ -37,12 +40,11 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/api/v1/gerenciamento/")
 public class PessoaController {
-	
+	//Neste controller faremos uso do CRUD. Injetamos todos serviços.
 	@Autowired private CreatePessoaService createService;
-	@Autowired private DeletePessoaService deleteService;
-	@Autowired private UpdatePessoaService updateService;
 	@Autowired private FindPessoaService findService;
-	
+	@Autowired private UpdatePessoaService updateService;
+	@Autowired private DeletePessoaService deleteService;
 	
 	@GetMapping("pessoas")
 	@ResponseStatus(HttpStatus.OK)
@@ -56,21 +58,31 @@ public class PessoaController {
 	@GetMapping("pessoas/{identificador}")
 	@ResponseStatus(HttpStatus.OK)
 	public PessoaResponse getPessoaById(@PathVariable("identificador") String identificador) {
-		log.info("Listando dados do pessoae {}.", identificador);
-		return PessoaMapper.mapper(findService.findByIdentificador(identificador));
+		log.info("Listando dados da pessoa {}", identificador);
+		Optional<Pessoa> pessoa = findService.findByIdentificador(identificador);
+		if(pessoa != null) {
+			return PessoaMapper.mapper(findService.findByIdentificador(identificador));
+		}else {
+			throw new PessoaNotFound(Erro.IDENTIFICADOR_NAO_ENCONTRADO);
+		}
 	}
 	
 	@GetMapping("pessoas/nome/{nome}")
 	@ResponseStatus(HttpStatus.OK)
 	public PessoaResponse getPessoaByNome(@PathVariable("nome") String nome){
-		return PessoaMapper.mapper(findService.findByNome(nome));
+		log.info("Listando dados da pessoa {}", nome);
+		Optional<Pessoa> pessoa = findService.findByNome(nome);
+		if(pessoa != null) {
+			return PessoaMapper.mapper(pessoa);
+		}else {
+			throw new PessoaNotFound(Erro.PESSOA_INEXISTENTE);
+		}
 	}
 	
 	@PostMapping("pessoas")
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<Response<PessoaResponse>> savePessoa(@RequestBody Pessoa pessoa,
-			BindingResult result) throws NoSuchAlgorithmException{
-		
+			BindingResult result) throws NoSuchAlgorithmException{	
 		log.info("Cadastrando o pessoa {}.", pessoa.getNome());
 		Response<PessoaResponse> response = new Response<PessoaResponse>();
 		validarPessoaExistente(pessoa, result);

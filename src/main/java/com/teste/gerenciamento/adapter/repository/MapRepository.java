@@ -31,6 +31,9 @@ public class MapRepository implements PessoaRepository {
 
 	@Override
 	public Optional<Pessoa> findByIdentificador(String identificador){
+		if(identificador == null || identificador.isBlank()) {
+			return null;
+		}
 		return Optional.ofNullable(mapDB.get(identificador));
 	}
 
